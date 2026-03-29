@@ -282,9 +282,11 @@ class WebSearchVC: UIViewController {
   }
 
   private func startPolling(downloadId: String, key: String, indexPath: IndexPath) {
-    let timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] timer in
-      guard let self else { timer.invalidate(); return }
-      self.pollStatus(downloadId: downloadId, key: key, indexPath: indexPath, timer: timer)
+    let timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
+      guard let self else { return }
+      Task { @MainActor [weak self] in
+        self?.pollStatus(downloadId: downloadId, key: key, indexPath: indexPath)
+      }
     }
     downloadTimers[key] = timer
   }
@@ -292,8 +294,7 @@ class WebSearchVC: UIViewController {
   private func pollStatus(
     downloadId: String,
     key: String,
-    indexPath: IndexPath,
-    timer: Timer
+    indexPath: IndexPath
   ) {
     guard let url = URL(string: "\(Self.nasApiBase)/status/\(downloadId)") else { return }
     URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
@@ -307,7 +308,7 @@ class WebSearchVC: UIViewController {
         switch resp.status {
         case "done", "already_exists":
           state = .done
-          timer.invalidate()
+          self.downloadTimers[key]?.invalidate()
           self.downloadTimers.removeValue(forKey: key)
           if indexPath.row < self.results.count {
             self.results[indexPath.row].isInLibrary = true
@@ -317,7 +318,7 @@ class WebSearchVC: UIViewController {
           }
         case "error":
           state = .error(resp.error ?? "Error")
-          timer.invalidate()
+          self.downloadTimers[key]?.invalidate()
           self.downloadTimers.removeValue(forKey: key)
         default:
           let progress = resp.progress ?? 0

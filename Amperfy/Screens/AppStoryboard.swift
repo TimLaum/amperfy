@@ -107,6 +107,7 @@ enum AppStoryboard: String {
     account: account
   ) }
   func segueToSearch(account: Account) -> SearchVC { SearchVC(account: account) }
+  func segueToWebSearch(account: Account) -> WebSearchVC { WebSearchVC(account: account) }
   func segueToSettings() -> SettingsHostVC { SettingsHostVC(isForOwnWindow: false) }
   func segueToDownloads(account: Account) -> UIViewController { DownloadsVC(account: account) }
   func segueToRadios(account: Account) -> UIViewController { RadiosVC(account: account) }

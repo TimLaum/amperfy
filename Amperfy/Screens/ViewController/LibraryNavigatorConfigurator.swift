@@ -65,11 +65,13 @@ final class LibraryNavigatorItem: Hashable, Sendable {
 enum TabNavigatorItem: Int, Hashable, CaseIterable {
   case search
   case home
+  case webSearch
 
   var title: String {
     switch self {
     case .home: return "Home"
     case .search: return "Search"
+    case .webSearch: return "Web Search"
     }
   }
 
@@ -78,6 +80,7 @@ enum TabNavigatorItem: Int, Hashable, CaseIterable {
     switch self {
     case .home: return .home
     case .search: return .search
+    case .webSearch: return UIImage(systemName: "globe") ?? .search
     }
   }
 
@@ -86,6 +89,7 @@ enum TabNavigatorItem: Int, Hashable, CaseIterable {
     switch self {
     case .home: return AppStoryboard.Main.segueToHome(account: account)
     case .search: return AppStoryboard.Main.segueToSearch(account: account)
+    case .webSearch: return AppStoryboard.Main.segueToWebSearch(account: account)
     }
   }
 }

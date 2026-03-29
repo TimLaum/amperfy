@@ -28,6 +28,7 @@ class TabBarVC: UITabBarController {
   private var libraryGroup: UITabGroup?
   private var searchTab: UISearchTab?
   private var homeTab: UITab?
+  private var webSearchTab: UITab?
   private let account: Account
 
   init(account: Account) {
@@ -66,6 +67,18 @@ class TabBarVC: UITabBarController {
       )
     }
     fixTabs.append(homeTab!)
+
+    webSearchTab = UITab(
+      title: TabNavigatorItem.webSearch.title,
+      image: TabNavigatorItem.webSearch.icon,
+      identifier: "Tabs.\(TabNavigatorItem.webSearch.title)"
+    ) { _ in
+      UINavigationController(
+        rootViewController: TabNavigatorItem.webSearch
+          .getController(account: self.account)
+      )
+    }
+    fixTabs.append(webSearchTab!)
 
     var libraryTabs = [UITab]()
     let libraryTabsShown = appDelegate.storage.settings.accounts
@@ -282,6 +295,8 @@ extension TabBarVC: MainSceneHostingViewController {
       selectedTab = homeTab
     case .search:
       selectedTab = searchTab
+    case .webSearch:
+      selectedTab = webSearchTab
     }
     configureTraitChangesForMiniPlayer()
   }

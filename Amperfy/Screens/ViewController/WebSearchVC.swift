@@ -94,7 +94,7 @@ class WebSearchVC: UIViewController {
     tv.translatesAutoresizingMaskIntoConstraints = false
     tv.register(
       WebSearchTableCell.self,
-      forCellReuseIdentifier: WebSearchTableCell.typeName
+      forCellReuseIdentifier: WebSearchTableCell.reuseIdentifier
     )
     tv.rowHeight = WebSearchTableCell.rowHeight
     tv.dataSource = self
@@ -374,7 +374,7 @@ extension WebSearchVC: UITableViewDataSource {
     cellForRowAt indexPath: IndexPath
   ) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(
-      withIdentifier: WebSearchTableCell.typeName,
+      withIdentifier: WebSearchTableCell.reuseIdentifier,
       for: indexPath
     ) as! WebSearchTableCell
     let result = results[indexPath.row]

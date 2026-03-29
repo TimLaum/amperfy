@@ -24,7 +24,7 @@ import UIKit
 // MARK: - WebSearchTableCell
 
 class WebSearchTableCell: UITableViewCell {
-  static let typeName = "WebSearchTableCell"
+  static let reuseIdentifier = "WebSearchTableCell"
   static let rowHeight: CGFloat = 72.0
 
   // MARK: - Subviews

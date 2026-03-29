@@ -1,0 +1,60 @@
+name: Build Amperfy IPA
+
+on:
+  push:
+    branches: [main, dev]
+  workflow_dispatch: # permet de lancer manuellement depuis GitHub
+
+jobs:
+  build:
+    runs-on: macos-15 # macOS Sonoma avec Xcode 16+
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: |
+          # Lister les versions disponibles et prendre la plus récente
+          ls /Applications/ | grep Xcode
+          sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer || \
+          sudo xcode-select -s /Applications/Xcode_16.1.app/Contents/Developer || \
+          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+          xcodebuild -version
+
+      - name: Resolve dependencies
+        run: |
+          # Amperfy utilise Swift Package Manager
+          xcodebuild -resolvePackageDependencies \
+            -project Amperfy.xcodeproj \
+            -scheme Amperfy
+
+      - name: Build archive (unsigned)
+        run: |
+          xcodebuild archive \
+            -project Amperfy.xcodeproj \
+            -scheme Amperfy \
+            -destination "generic/platform=iOS" \
+            -archivePath build/Amperfy.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            -skipPackagePluginValidation \
+            -allowProvisioningUpdates
+
+      - name: Create IPA from archive
+        run: |
+          mkdir -p build/Payload
+          cp -r build/Amperfy.xcarchive/Products/Applications/Amperfy.app build/Payload/
+          cd build
+          zip -r Amperfy-unsigned.ipa Payload
+          ls -la Amperfy-unsigned.ipa
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Amperfy-unsigned-ipa
+          path: build/Amperfy-unsigned.ipa
+          retention-days: 30

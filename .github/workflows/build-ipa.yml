@@ -8,19 +8,27 @@ on:
 jobs:
   build:
     runs-on: macos-26
-    timeout-minutes: 45
+    timeout-minutes: 60
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Show available Xcode installations
+        run: ls /Applications/ | grep -i xcode || true
+
       - name: Select Xcode version
         run: |
-          # Prefer Xcode 26, fall back to latest available
+          # Try Xcode 26.x first, then fall back to latest Xcode.app
           sudo xcode-select -s /Applications/Xcode_26.app/Contents/Developer 2>/dev/null || \
           sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
           xcodebuild -version
           xcrun --sdk iphoneos --show-sdk-version
+
+      - name: Install iOS platform SDK
+        run: |
+          # Downloads the iOS SDK matching the selected Xcode (iOS 26 on Xcode 26)
+          xcodebuild -downloadPlatform iOS
 
       - name: Resolve dependencies
         run: |

@@ -35,7 +35,8 @@ jobs:
         run: |
           xcodebuild -resolvePackageDependencies \
             -project Amperfy.xcodeproj \
-            -scheme Amperfy
+            -scheme Amperfy \
+            IPHONEOS_DEPLOYMENT_TARGET=18.2
 
       - name: Build archive (unsigned)
         run: |
@@ -48,6 +49,7 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGN_ENTITLEMENTS="" \
+            IPHONEOS_DEPLOYMENT_TARGET=18.2 \
             -skipPackagePluginValidation \
             -allowProvisioningUpdates
 
